@@ -103,35 +103,35 @@ assessment_model = api.model("AssessmentInput", {
     "ideal_day": fields.String
 })
 
-# 🔐 Signup route
+# 🔐 Signup route (accepts username or email)
 @app.route("/signup", methods=["POST"])
 def signup():
     data = request.json
-    username = data.get("username")
+    identifier = data.get("username") or data.get("email")
     password = data.get("password")
 
-    if not username or not password:
-        return jsonify({"error": "Username and password required"}), 400
+    if not identifier or not password:
+        return jsonify({"error": "Username or email and password required"}), 400
 
-    if User.query.filter_by(username=username).first():
-        return jsonify({"error": "Username already exists"}), 400
+    if User.query.filter_by(username=identifier).first():
+        return jsonify({"error": "Account already exists"}), 400
 
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-    new_user = User(username=username, password_hash=password_hash)
+    new_user = User(username=identifier, password_hash=password_hash)
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify({"message": "Signup successful"}), 201
 
-# 🔐 Login route
+# 🔐 Login route (accepts username or email)
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
-    username = data.get("username")
+    identifier = data.get("username") or data.get("email")
     password = data.get("password")
 
-    logging.info(f"Login attempt: {username}")
-    user = User.query.filter_by(username=username).first()
+    logging.info(f"Login attempt: {identifier}")
+    user = User.query.filter_by(username=identifier).first()
     if not user or not bcrypt.check_password_hash(user.password_hash, password):
         return jsonify({"error": "Invalid credentials"}), 401
 
