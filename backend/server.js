@@ -1,19 +1,24 @@
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/db');
-const User = require('./models/User'); // Import the model we created
+const User = require('./models/User');
 
 const app = express();
 
-// Middleware
 app.use(cors());
-app.use(express.json()); // Allows us to receive JSON data from the frontend
+app.use(express.json());
 
-// Test Database Connection and Sync
-sequelize.sync({ force: false }) // 'force: false' prevents deleting data on every restart
+// We want to make sure your server initialization still looks clean like this:
+sequelize.sync({ force: false }) 
     .then(() => {
-        console.log('MySQL Connected & Tables Synced');
+        console.log('MySQL Connected... ');
         const PORT = process.env.PORT || 5000;
-        app.listen(PORT, () => console.log(`Server running on port ${PORT} `));
+        app.listen(PORT, () => console.log(`Server running on port ${PORT} 🚀`));
     })
-    .catch(err => console.error('Unable to connect to database:', err));
+    .catch(err => console.error('Database connection error:', err));
+
+// Add this line with your other routing imports
+const appointmentRoutes = require('./routes/appointments');
+
+// Mount the engine paths
+app.use('/api/appointments', appointmentRoutes);
