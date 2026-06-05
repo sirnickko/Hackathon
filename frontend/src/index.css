@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors;
+  }
+
+  .btn-sm {
+    @apply px-2 py-1 text-sm;
+  }
+
+  .card {
+    @apply bg-white rounded-lg border border-gray-200 shadow-sm;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-200;
+  }
+
+  .card-body {
+    @apply px-6 py-4;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-200 rounded-lg font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+
+  .badge-high-risk {
+    @apply px-3 py-1 bg-red-100 text-risk-high rounded-full text-sm font-medium;
+  }
+
+  .badge-medium-risk {
+    @apply px-3 py-1 bg-yellow-100 text-risk-medium rounded-full text-sm font-medium;
+  }
+
+  .badge-low-risk {
+    @apply px-3 py-1 bg-green-100 text-risk-low rounded-full text-sm font-medium;
+  }
+}
