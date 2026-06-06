@@ -6,9 +6,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#0066CC',
-        'primary-light': '#E6F0FF',
-        'primary-dark': '#004DA6',
+        // 🎨 Premium Medical Teal Identity Transformation
+        primary: '#0d9488',          // Soothing Teal 600 (Main brand, buttons, accents)
+        'primary-light': '#f0fdfa',    // Ultra-soft Teal 50 (Card backgrounds, alerts)
+        'primary-dark': '#115e59',     // Deep Teal 800 (Hover states, headers, dark text)
+        
+        // Clinical Alert States (Kept highly standard for healthcare readability)
         success: '#10B981',
         warning: '#F59E0B',
         danger: '#EF4444',

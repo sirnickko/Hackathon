@@ -1,6 +1,12 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
-const sequelize = require('./config/db');
+
+// FORCE NODE TO READ THE EXACT PATH OF YOUR ENV FILE
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+const sequelize = require('./config/db'); // or wherever your db configuration file sits
+
 
 const app = express();
 

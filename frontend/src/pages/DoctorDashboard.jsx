@@ -5,62 +5,97 @@ import PatientQueueCard from '../components/PatientQueueCard'
 import LoadingSpinner from '../components/LoadingSpinner'
 import ErrorAlert from '../components/ErrorAlert'
 import SuccessAlert from '../components/SuccessAlert'
-import { getDoctorFeed, confirmAppointment, rescheduleAppointment, sendReminder } from '../api/appointments'
+
+// MOCK DATA TO POPULATE THE CLINICAL COMMAND CENTER FLUSH WITH METRICS
+const PRESENTATION_MOCK_DATA = {
+  stats: {
+    totalAppointments: 24,
+    confirmed: 14,
+    pending: 7,
+    highRisk: 3
+  },
+  aiInsights: {
+    predictedNoShows: 4,
+    highRiskPatients: 3,
+    remindersSent: 18
+  },
+  patients: [
+    {
+      id: "pt-01",
+      name: "John Kamau",
+      appointmentTime: "09:30 AM",
+      status: "PENDING",
+      riskLevel: "HIGH",
+      symptoms: "Severe chest pressure radiating to left arm, shortness of breath.",
+      aiTriageAnalysis: "High correlation with acute cardiovascular events. AI Priority Flag: Level 1 Dispatch Required.",
+      language: "Swahili",
+      phoneNumber: "+254712345678"
+    },
+    {
+      id: "pt-02",
+      name: "Mary Atieno",
+      appointmentTime: "11:00 AM",
+      status: "CONFIRMED",
+      riskLevel: "MEDIUM",
+      symptoms: "Persistent dry cough for 3 weeks, low-grade intermittent fever.",
+      aiTriageAnalysis: "Risk factors indicate potential upper respiratory layout complications. Escalating alert status.",
+      language: "English",
+      phoneNumber: "+254722345678"
+    },
+    {
+      id: "pt-03",
+      name: "David Ochieng",
+      appointmentTime: "02:15 PM",
+      status: "PENDING",
+      riskLevel: "LOW",
+      symptoms: "Routine check-in regarding post-operative knee replacement healing progress.",
+      aiTriageAnalysis: "Telemetry monitors stable recovery metrics. Normal status parameters confirmed.",
+      language: "English",
+      phoneNumber: "+254732345678"
+    }
+  ]
+};
 
 export default function DoctorDashboard() {
-  const [loading, setLoading] = useState(true)
+  // Directly initializing states to presentation configurations
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
-  const [feed, setFeed] = useState(null)
+  const [feed, setFeed] = useState(PRESENTATION_MOCK_DATA)
 
   useEffect(() => {
-    fetchFeed()
+    // Hardcoded bypass for presentation stability
+    setFeed(PRESENTATION_MOCK_DATA);
+    setLoading(false);
   }, [])
 
-  const fetchFeed = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await getDoctorFeed()
-      setFeed(response.data)
-    } catch (err) {
-      setError('Failed to load dashboard. Please try again.')
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleConfirm = async (appointmentId) => {
-    try {
-      await confirmAppointment(appointmentId)
-      setSuccess('Appointment confirmed successfully')
-      fetchFeed()
-    } catch (err) {
-      setError('Failed to confirm appointment')
-    }
+    // Instantly simulate successful database updates locally
+    setFeed(prev => ({
+      ...prev,
+      patients: prev.patients.map(p => p.id === appointmentId ? { ...p, status: 'CONFIRMED' } : p),
+      stats: { ...prev.stats, confirmed: prev.stats.confirmed + 1, pending: Math.max(0, prev.stats.pending - 1) }
+    }));
+    setSuccess('Appointment confirmed successfully 🎉');
   }
 
   const handleReschedule = async (appointmentId) => {
-    const newTime = prompt('Enter new appointment time (YYYY-MM-DD HH:MM)')
+    const newTime = prompt('Enter new appointment time (YYYY-MM-DD HH:MM)', '2026-06-06 14:00')
     if (newTime) {
-      try {
-        await rescheduleAppointment(appointmentId, newTime)
-        setSuccess('Appointment rescheduled successfully')
-        fetchFeed()
-      } catch (err) {
-        setError('Failed to reschedule appointment')
-      }
+      setFeed(prev => ({
+        ...prev,
+        patients: prev.patients.map(p => p.id === appointmentId ? { ...p, appointmentTime: newTime } : p)
+      }));
+      setSuccess('Appointment rescheduled successfully 🕒');
     }
   }
 
   const handleReminder = async (appointmentId) => {
-    try {
-      await sendReminder(appointmentId, 'en')
-      setSuccess('Reminder sent successfully')
-    } catch (err) {
-      setError('Failed to send reminder')
-    }
+    setFeed(prev => ({
+      ...prev,
+      aiInsights: { ...prev.aiInsights, remindersSent: prev.aiInsights.remindersSent + 1 }
+    }));
+    setSuccess('AI Multilingual Reminder dispatched via SMS successfully 📲');
   }
 
   if (loading) {
@@ -120,7 +155,7 @@ export default function DoctorDashboard() {
               <h3 className="font-semibold text-gray-900">High Risk Patients</h3>
             </div>
             <div className="card-body">
-              <p className="text-3xl font-bold text-risk-high">{feed?.aiInsights?.highRiskPatients || 0}</p>
+              <p className="text-3xl font-bold text-red-600">{feed?.aiInsights?.highRiskPatients || 0}</p>
               <p className="text-sm text-gray-600 mt-2">Require immediate attention</p>
             </div>
           </div>

@@ -8,27 +8,31 @@ import ReminderCenter from './pages/ReminderCenter'
 import PatientDashboard from './pages/PatientDashboard'
 
 function ProtectedRoute({ children, requiredRole }) {
-  const { isAuthenticated, user } = useAuth()
+  // EMERGENCY PRESENTATION BYPASS: Force authentication guards to approve access
+  const isAuthenticated = true;
+  
+  // Dynamically matches the role required by the route during the pitch
+  const user = { role: requiredRole }; 
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />
-  }
-
-  if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to={user?.role === 'DOCTOR' ? '/doctor' : '/patient'} />
-  }
-
-  return children
+  return children;
 }
 
 function AppRoutes() {
-  const { isAuthenticated, user } = useAuth()
+  // ⚡ HACKATHON PRESENTATION CONTROLLER:
+  // Change this to 'DOCTOR' to display the Doctor Dashboard
+  // Change this to 'PATIENT' to display the Patient Dashboard
+  const currentPresentationRole = 'DOCTOR'; 
 
   return (
     <Routes>
+      {/* Force the landing page (/) and /login to load your active presentation dashboard instantly */}
+      <Route
+        path="/"
+        element={currentPresentationRole === 'DOCTOR' ? <Navigate to="/doctor" /> : <Navigate to="/patient" />}
+      />
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to={user?.role === 'DOCTOR' ? '/doctor' : '/patient'} /> : <LoginPage />}
+        element={currentPresentationRole === 'DOCTOR' ? <Navigate to="/doctor" /> : <Navigate to="/patient" />}
       />
 
       {/* Doctor Routes */}
@@ -78,9 +82,8 @@ function AppRoutes() {
         }
       />
 
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="*" element={<Navigate to="/login" />} />
+      {/* Catch-all safety redirect straight into the active presentation dashboard */}
+      <Route path="*" element={currentPresentationRole === 'DOCTOR' ? <Navigate to="/doctor" /> : <Navigate to="/patient" />} />
     </Routes>
   )
 }
